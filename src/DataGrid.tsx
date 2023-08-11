@@ -451,7 +451,8 @@ function DataGrid<R, SR, K extends Key>(
         setScrollToPosition({ idx: scrollToIdx, rowIdx: scrollToRowIdx });
       }
     },
-    selectCell
+    selectCell,
+    deselectCell,
   }));
 
   /**
@@ -677,7 +678,12 @@ function DataGrid<R, SR, K extends Key>(
       isSelectedCellEditable({ columns, rows, selectedPosition: position })
     );
   }
-
+  
+  function deselectCell(): void {
+    setSelectedPosition({ idx: -1, rowIdx: -1, mode: 'SELECT' });
+    setDraggedOverRowIdx(undefined);
+  }
+  
   function selectCell(position: Position, enableEditor?: Maybe<boolean>): void {
     if (!isCellWithinSelectionBounds(position)) return;
     commitEditorChanges();
