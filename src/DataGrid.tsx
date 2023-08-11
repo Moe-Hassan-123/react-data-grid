@@ -1,8 +1,20 @@
-import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import type { Key, KeyboardEvent, RefAttributes } from 'react';
-import { flushSync } from 'react-dom';
 import clsx from 'clsx';
+import type { Key, KeyboardEvent, RefAttributes } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
+import {
+  DataGridDefaultRenderersProvider,
+  useDefaultRenderers
+} from './DataGridDefaultRenderersProvider';
+import DragHandle from './DragHandle';
+import EditCell from './EditCell';
+import HeaderRow from './HeaderRow';
+import { defaultRenderRow } from './Row';
+import type { PartialPosition } from './ScrollToCell';
+import ScrollToCell from './ScrollToCell';
+import SummaryRow from './SummaryRow';
+import { renderCheckbox as defaultRenderCheckbox } from './cellRenderers';
 import {
   RowSelectionChangeProvider,
   RowSelectionProvider,
@@ -14,25 +26,19 @@ import {
   useViewportColumns,
   useViewportRows
 } from './hooks';
+import { default as defaultRenderSortStatus } from './sortStatus';
 import {
-  abs,
-  assertIsValidKeyGetter,
-  canExitGrid,
-  createCellEvent,
-  getColSpan,
-  getNextSelectedCellPosition,
-  isCtrlKeyHeldDown,
-  isDefaultCellInput,
-  isSelectedCellEditable,
-  renderMeasuringCells,
-  scrollIntoView,
-  sign
-} from './utils';
+  focusSinkClassname,
+  focusSinkHeaderAndSummaryClassname,
+  rootClassname,
+  viewportDraggingClassname
+} from './style/core';
+import { rowSelected, rowSelectedWithFrozenCell } from './style/row';
 import type {
   CalculatedColumn,
   CellClickArgs,
-  CellKeyboardEvent,
   CellKeyDownArgs,
+  CellKeyboardEvent,
   CellMouseEvent,
   CellNavigationMode,
   Column,
@@ -47,26 +53,20 @@ import type {
   SelectRowEvent,
   SortColumn
 } from './types';
-import { renderCheckbox as defaultRenderCheckbox } from './cellRenderers';
 import {
-  DataGridDefaultRenderersProvider,
-  useDefaultRenderers
-} from './DataGridDefaultRenderersProvider';
-import DragHandle from './DragHandle';
-import EditCell from './EditCell';
-import HeaderRow from './HeaderRow';
-import { defaultRenderRow } from './Row';
-import type { PartialPosition } from './ScrollToCell';
-import ScrollToCell from './ScrollToCell';
-import { default as defaultRenderSortStatus } from './sortStatus';
-import {
-  focusSinkClassname,
-  focusSinkHeaderAndSummaryClassname,
-  rootClassname,
-  viewportDraggingClassname
-} from './style/core';
-import { rowSelected, rowSelectedWithFrozenCell } from './style/row';
-import SummaryRow from './SummaryRow';
+  abs,
+  assertIsValidKeyGetter,
+  canExitGrid,
+  createCellEvent,
+  getColSpan,
+  getNextSelectedCellPosition,
+  isCtrlKeyHeldDown,
+  isDefaultCellInput,
+  isSelectedCellEditable,
+  renderMeasuringCells,
+  scrollIntoView,
+  sign
+} from './utils';
 
 export interface SelectCellState extends Position {
   readonly mode: 'SELECT';
