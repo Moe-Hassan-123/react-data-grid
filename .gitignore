@@ -1,6 +1,6 @@
 /coverage
 /dist
-/lib
+# /lib
 /node_modules
 /tmp
 /.eslintcache
